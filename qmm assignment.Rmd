@@ -1,0 +1,78 @@
+---
+title: "Untitled"
+author: "qmm 1"
+date: '2022-09-23'
+output:
+  word_document: default
+  pdf_document: default
+---
+install.packages("lpSolve")
+```{r}
+library(lpSolve)
+#Objective Function 
+f.obj <- c(420,360,300,420,360,300,420,360,300)
+
+# Subject to 
+# L1 + M1 + S1 < 750 
+# L2 + M2 + S2 = 900 
+# L3 + M3 + S3 < 450
+
+# 2011 + 15M1 + 1251 < 13000 
+# 20L2 + 15M2 + 12S2 = 12000 
+#2013 + 15M3 + 12S3 < 5000
+
+#L1 + L2 + L3 < 900 
+#M1 + M2 + M3 < 1200 
+#S1 + S2 + S3 < 750 
+
+ #Non-negativity constraints
+ #  L1, L2, L3, M1, M2, M3, S1, S2, S3 > 0 
+
+#The above LP problem constraints can be written as:
+#L1 + M1 + S1 +0L2 +0M2 +0S2 + 0L3 + OM3 +0S3 < 750 
+#OL1 +0M1 + OS1 + L2 + M2 + S2 +0L3 + OM3 +0S3 < 900
+#OL1 +0M1 +0S1 + 0L2 +0M2 + OS2 + L3 + M3 + S3 < 450
+
+#20L1 + 15M1 + 12S1 +0L2 + 0M2 + OS2 + 0L3 +0M3 +0S3 < 13000 
+#OL1 + OM1 + 0S1 + 20L2 + 15M2 + 12S2 + 0L3 + 0M3 + 0S3 < 12000 
+#OL1 +0M1 +0S1 +0L2 + 0M2 + OS2 + 20L3 + 15M3 + 12S3 < 5000 
+
+#L1 +0M1 +0S1 + L2 +0M2 + OS2 + L3 + OM3 + OS3 < 900
+#OL1 + M1 +0S1 +0L2 + M2 + 0S2 +0L3 + M3 + OS: < 1200
+#OL1 +0M1 + S1 + OL2 + 0M2 + S2 +0L3 +0M3 + S3 < 750
+
+#Constraints 
+f.con <- matrix(c(1,1,1,0,0,0,0,0,0, 
+                  0,0,0,1,1,1,0,0,0,
+                  0,0,0,0,0,0,1,1,1, 
+                  20,15,12,0,0,0,0,0,0, 
+                  0,0,0,20,15,12,0,0,0, 
+                  0,0,0,0,0,0,20,15,12, 
+                  1,0,0,1,0,0,1,0,0, 
+                  0,1,0,0,1,0,0,1,0, 
+                  0,0,1,0,0,1,0,0,1), nrow = 9, byrow =TRUE) 
+
+#Direction of inequality constraints 
+f.dir <- c("<=", 
+           "<=", 
+           "<=", 
+           "<=", 
+           "<=", 
+           "<=", 
+           "<=", 
+           "<=", 
+           "<=") 
+
+#Right hand side coefficients 
+f.rhs <- c(750,900,450,13000, 12000,5000,900, 1200,750) 
+
+# Objective value 
+lp("max", f.obj, f.con, f.dir, f.rhs) 
+
+#Values of the variables 
+lp("max", f.obj, f.con, f.dir, f.rhs) $solution 
+
+
+```
+
+
